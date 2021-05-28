@@ -10,10 +10,17 @@ def array(array_like, dtype=None):
 
     See syntax here: https://numpy.org/doc/stable/reference/generated/numpy.array.html
     """
-    if not is_casadi_type(array_like, recursive=True):
+    if is_casadi_type(array_like, recursive=False):  # If you were literally given a CasADi array, just return it
+        # Handles inputs like cas.DM([1, 2, 3])
+        return array_like
+
+    elif not is_casadi_type(array_like,
+                            recursive=True):  # If you were given a list of iterables that don't have CasADi types:
+        # Handles inputs like [[1, 2, 3], [4, 5, 6]]
         return _onp.array(array_like, dtype=dtype)
 
     else:
+        # Handles inputs like [[opti_var_1, opti_var_2], [opti_var_3, opti_var_4]]
         def make_row(contents: List):
             try:
                 return _cas.horzcat(*contents)
@@ -100,7 +107,7 @@ def dstack(arrays):
 
 def length(array) -> int:
     """
-    Returns the length of an 1D-array-like object.
+    Returns the length of an 1D-array-like object. An extension of len() with slightly different functionality.
     Args:
         array:
 
@@ -119,6 +126,7 @@ def length(array) -> int:
         else:
             return array.shape[1]
 
+
 def diag(v, k=0):
     """
     Extract a diagonal or construct a diagonal array.
@@ -132,9 +140,77 @@ def diag(v, k=0):
         if k != 0:
             raise NotImplementedError("Should be super possible, just haven't had the need yet.")
 
-        if v.shape[0] == 1 or v.shape[1] == 1:
+        if 1 in v.shape:
             return _cas.diag(v)
         elif v.shape[0] == v.shape[1]:
             raise NotImplementedError("Should be super possible, just haven't had the need yet.")
         else:
             raise ValueError("Cannot return the diagonal of a non-square matrix.")
+
+
+def roll(a, shift, axis: int = None):
+    """
+    Roll array elements along a given axis.
+
+    Elements that roll beyond the last position are re-introduced at the first.
+
+    See syntax here: https://numpy.org/doc/stable/reference/generated/numpy.roll.html
+
+    Parameters
+    ----------
+    a : array_like
+        Input array.
+    shift : int
+        The number of places by which elements are shifted.
+
+    Returns
+    -------
+    res : ndarray
+        Output array, with the same shape as a.
+
+    """
+    if not is_casadi_type(a):
+        return _onp.roll(a, shift, axis=axis)
+    else:  # TODO add some checking to make sure shift < len(a), or shift is modulo'd down by len(a).
+        # assert shift < a.shape[axis]
+        if 1 in a.shape and axis == 0:
+            return _cas.vertcat(a[-shift, :], a[:-shift, :])
+        elif axis == 0:
+            return _cas.vertcat(a.T[:, -shift], a.T[:, :-shift]).T
+        elif axis == 1:
+            return _cas.horzcat(a[:, -shift], a[:, :-shift])
+        elif axis is None:
+            return roll(a, shift=shift, axis=0)
+        else:
+            raise Exception("CasADi types can only be up to 2D, so `axis` must be None, 0, or 1.")
+
+
+def max(a):
+    """
+    Returns the maximum value of an array
+    """
+
+    try:
+        return _onp.max(a)
+    except TypeError:
+        return _cas.mmax(a)
+
+
+def min(a):
+    """
+    Returns the minimum value of an array
+    """
+
+    try:
+        return _onp.min(a)
+    except TypeError:
+        return _cas.mmin(a)
+
+
+def reshape(a, newshape):
+    """Gives a new shape to an array without changing its data."""
+
+    if not is_casadi_type(a):
+        return _onp.reshape(a, newshape)
+    else:
+        return _cas.reshape(a, newshape)

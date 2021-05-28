@@ -89,7 +89,7 @@ def get_kulfan_coordinates(
         lower_weights=-0.2 * np.ones(5),  # type: np.ndarray
         upper_weights=0.2 * np.ones(5),  # type: np.ndarray
         enforce_continuous_LE_radius=True,
-        TE_thickness=0.005,  # type: float
+        TE_thickness=0.,  # type: float
         n_points_per_side=_default_n_points_per_side,  # type: int
         N1=0.5,  # type: float
         N2=1.0,  # type: float
@@ -124,6 +124,8 @@ def get_kulfan_coordinates(
 
     x_lower = np.cosspace(0, 1, n_points_per_side)
     x_upper = x_lower[::-1]
+
+    x_lower = x_lower[1:] # Trim off the nose coordinate so there are no duplicates
 
     def shape(w, x):
         # Class function
