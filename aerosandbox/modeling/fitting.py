@@ -12,6 +12,7 @@ class FittedModel(SurrogateModel):
 
     You can evaluate this model at a given point by calling it just like a function, e.g.:
 
+    >>> my_fitted_model = FittedModel(...)  # See FittedModel.__init__ docstring for syntax
     >>> y = my_fitted_model(x)
 
     The input to the model (`x` in the example above) is of the type:
@@ -92,7 +93,7 @@ class FittedModel(SurrogateModel):
 
                 * param_initial_guess is a float; note that only scalar parameters are allowed.
 
-            parameter_bounds: Optional: a dict of bounds on fit parameters. Syntax is {param_name:(min, max)}.
+            parameter_bounds: Optional: a dict of bounds on fit parameters. Syntax is {"param_name":(min, max)}.
 
                 * May contain only a subset of param_guesses if desired.
 
