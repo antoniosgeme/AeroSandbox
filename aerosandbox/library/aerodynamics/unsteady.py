@@ -27,74 +27,7 @@ from scipy.integrate import quad
 
 
 def main():
-    def top_hat_gust(reduced_time: float) -> float:
-        """
-        A canonical example gust. 
-        Args:
-            reduced_time (float) 
-        Returns:
-            gust_velocity (float)
-        """
-        if 5 <= reduced_time <= 10:
-            gust_velocity = 1
-        else:
-            gust_velocity = 0 
-            
-        return gust_velocity
-    
-    def sine_squared_gust(reduced_time: float) -> float:
-        """
-        A canonical gust of used by the FAA to show 'compliance with the 
-        requirements of Title 14, Code of Federal Regulations (14 CFR) 25.341, 
-        Gust and turbulence loads. Section 25.341 specifies the discrete gust 
-        and continuous turbulence dynamic load conditions that apply to the 
-        airplane and engines.'
-        Args:
-            reduced_time (float) 
-        Returns:
-            gust_velocity (float)
-        """
-        gust_strength = 1
-        start = 5
-        finish = 10
-        gust_width_to_chord_ratio = 5
-        if start <= reduced_time <= finish:
-            gust_velocity = (gust_strength * 
-            np.sin( (np.pi* reduced_time ) /
-                      gust_width_to_chord_ratio)**2)
-        else:
-            gust_velocity = 0 
-            
-        return gust_velocity
-    
-    
-    def gaussian_pitch(reduced_time: float) -> float:
-        """
-        A pitch maneuver resembling a guassian curve
-        Args:
-            reduced_time (float) 
-        Returns:
-            angle_of_attack (float) : in degrees
-        """
-        return -25*np.exp(-((reduced_time-7.5)/3)**2)
-    
-    def linear_ramp_pitch(reduced_time: float) -> float:
-        """
-        A pitch maneuver resembling a linear ramp
-        Args:
-            reduced_time (float) 
-        Returns:
-            angle_of_attack (float) : in degrees
-        """
-        if reduced_time < 7.5:
-            angle_of_attack = -3.3 * reduced_time
-        else:
-            angle_of_attack = 2 * reduced_time - 40
-        
-        return angle_of_attack
-    
-    
-    
+       
     time = np.linspace(0,10,100) # Time in seconds
     wing_velocity = 2 # Wing horizontal velocity in m/s
     chord = 2 
@@ -211,7 +144,6 @@ def indicial_pitch_response(
         Args:
         reduced_time (float,np.ndarray) : Reduced time, equal to the number of semichords travelled. See function reduced_time
         angle_of_attack (float) : The angle of attack, in degrees
-
     """
     return 2 * np.pi * np.deg2rad(angle_of_attack) * wagners_function(reduced_time)
 
@@ -407,12 +339,72 @@ def pitching_through_transverse_gust(
     
     return gust_lift + pitch_lift + added_mass_lift
 
+def top_hat_gust(reduced_time: float) -> float:
+        """
+        A canonical example gust. 
+        Args:
+            reduced_time (float) 
+        Returns:
+            gust_velocity (float)
+        """
+        if 5 <= reduced_time <= 10:
+            gust_velocity = 1
+        else:
+            gust_velocity = 0 
+            
+        return gust_velocity
+    
+def sine_squared_gust(reduced_time: float) -> float:
+    """
+    A canonical gust of used by the FAA to show 'compliance with the 
+    requirements of Title 14, Code of Federal Regulations (14 CFR) 25.341, 
+    Gust and turbulence loads. Section 25.341 specifies the discrete gust 
+    and continuous turbulence dynamic load conditions that apply to the 
+    airplane and engines.'
+    Args:
+        reduced_time (float) 
+    Returns:
+        gust_velocity (float)
+    """
+    gust_strength = 1
+    start = 5
+    finish = 10
+    gust_width_to_chord_ratio = 5
+    if start <= reduced_time <= finish:
+        gust_velocity = (gust_strength * 
+        np.sin( (np.pi* reduced_time ) /
+                  gust_width_to_chord_ratio)**2)
+    else:
+        gust_velocity = 0 
+        
+    return gust_velocity
+
+
+def gaussian_pitch(reduced_time: float) -> float:
+    """
+    A pitch maneuver resembling a guassian curve
+    Args:
+        reduced_time (float) 
+    Returns:
+        angle_of_attack (float) : in degrees
+    """
+    return -25*np.exp(-((reduced_time-7.5)/3)**2)
+
+def linear_ramp_pitch(reduced_time: float) -> float:
+    """
+    A pitch maneuver resembling a linear ramp
+    Args:
+        reduced_time (float) 
+    Returns:
+        angle_of_attack (float) : in degrees
+    """
+    if reduced_time < 7.5:
+        angle_of_attack = -3.3 * reduced_time
+    else:
+        angle_of_attack = 2 * reduced_time - 40
+    
+    return angle_of_attack
+    
 
 if __name__ == "__main__":
     main()
-
-    
-    
-    
-    
-    
